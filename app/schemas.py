@@ -1,11 +1,11 @@
-from datetime import date, datetime, timezone
+from datetime import UTC, date, datetime
 from decimal import Decimal
 from typing import Literal, Self
 from uuid import UUID, uuid4
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
-ALLOWED_VAT_RATES = {Decimal("0"), Decimal("2.6"), Decimal("3.8"), Decimal("8.1")}
+ALLOWED_VAT_RATES = {Decimal(0), Decimal("2.6"), Decimal("3.8"), Decimal("8.1")}
 
 class ReceiptCreate(BaseModel):
     """What the client sends when adding a receipt."""
@@ -54,7 +54,7 @@ class Receipt(ReceiptCreate):
     user_id: str
     company_id: str
     account_number: str | None = None  # set later by classification
-    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
 
 
 class ReceiptList(BaseModel):
