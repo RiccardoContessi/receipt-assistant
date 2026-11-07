@@ -56,3 +56,34 @@ class Receipt(ReceiptCreate):
     account_number: str | None = None  # set later by classification
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
+
+class ReceiptList(BaseModel):
+    """a list of receipts"""
+    items : list[Receipt]
+
+class ReceiptFilter(BaseModel):
+    """filter parameters for receipts, not mandatory"""
+    date_from: date | None = None
+    date_to: date | None = None
+
+    @model_validator(mode="after")
+    def check_date(self) -> Self:
+        if self.date_from and self.date_to and self.date_from > self.date_to:
+            raise ValueError(f"date_from {self.date_from} is after date_to {self.date_to}")
+        return self
+
+class ChatRequest(BaseModel):
+    """user request"""
+    model_config = ConfigDict(extra="forbid")
+    message: str= Field(min_length=2, max_length=2000)
+    thread_id: str | None= None
+
+
+class ChatResponse(BaseModel):
+    """system response"""
+    answer: str 
+    thread_id: str
+
+class CurrentUser(BaseModel):
+    user_id: str
+    company_id: str
