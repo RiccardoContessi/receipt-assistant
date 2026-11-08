@@ -8,7 +8,9 @@ from app.store import ReceiptStore, get_store
 @pytest.fixture
 def client():
     store = ReceiptStore()  # fresh, empty store for each test
-    app.dependency_overrides[get_store] = lambda: store # override of get_store for tests
+    app.dependency_overrides[get_store] = lambda: (
+        store
+    )  # override of get_store for tests
 
     with TestClient(app) as test_client:
         yield test_client  # the test runs here
@@ -20,6 +22,7 @@ def client():
 def muller_headers():
     # Auth header of a logged-in user, as a real client would send it
     return {"Authorization": "Bearer token-muller"}
+
 
 @pytest.fixture
 def keller_headers():
@@ -66,6 +69,7 @@ def wrong_receipt_vat_rate():
         "vat_amount": "4.05",
         "total": "54.05",
     }
+
 
 @pytest.fixture
 def bakery_receipt():

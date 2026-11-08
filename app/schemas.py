@@ -101,3 +101,11 @@ class ChatResponse(BaseModel):
 class CurrentUser(BaseModel):
     user_id: str
     company_id: str
+
+
+class TotalSpent(BaseModel):
+    total: Decimal
+    currency: Literal["CHF"] = "CHF"
+    receipt_count: int
+    date_from: date
+    date_to: date

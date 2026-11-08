@@ -75,8 +75,12 @@ def test_list_receipts(client, muller_headers, valid_receipt):
 
 # The date filter keeps only receipts inside the range
 def test_list_filters_by_date(client, muller_headers, valid_receipt, bakery_receipt):
-    client.post("/v1/receipts", json=valid_receipt, headers=muller_headers)  # 2026-10-15
-    client.post("/v1/receipts", json=bakery_receipt, headers=muller_headers)  # 2026-10-22
+    client.post(
+        "/v1/receipts", json=valid_receipt, headers=muller_headers
+    )  # 2026-10-15
+    client.post(
+        "/v1/receipts", json=bakery_receipt, headers=muller_headers
+    )  # 2026-10-22
 
     response = client.get(
         "/v1/receipts",
@@ -102,8 +106,12 @@ def test_list_with_inverted_dates(client, muller_headers):
 
 
 # Tenant isolation: another company gets 404, not 403, so nothing leaks
-def test_other_company_cannot_see_receipt(client, muller_headers, keller_headers, valid_receipt):
-    receipt_id = client.post("/v1/receipts", json=valid_receipt, headers=muller_headers).json()["id"]
+def test_other_company_cannot_see_receipt(
+    client, muller_headers, keller_headers, valid_receipt
+):
+    receipt_id = client.post(
+        "/v1/receipts", json=valid_receipt, headers=muller_headers
+    ).json()["id"]
 
     response = client.get(f"/v1/receipts/{receipt_id}", headers=keller_headers)
 
@@ -111,7 +119,9 @@ def test_other_company_cannot_see_receipt(client, muller_headers, keller_headers
 
 
 # Tenant isolation: another company's list doesn't include it
-def test_other_company_list_is_empty(client, muller_headers, keller_headers, valid_receipt):
+def test_other_company_list_is_empty(
+    client, muller_headers, keller_headers, valid_receipt
+):
     client.post("/v1/receipts", json=valid_receipt, headers=muller_headers)
 
     response = client.get("/v1/receipts", headers=keller_headers)
@@ -120,20 +130,31 @@ def test_other_company_list_is_empty(client, muller_headers, keller_headers, val
 
 
 # Tenant isolation: another company cannot delete it, and the owner still has it
-def test_other_company_cannot_delete_receipt(client, muller_headers, keller_headers, valid_receipt):
-    receipt_id = client.post("/v1/receipts", json=valid_receipt, headers=muller_headers).json()["id"]
+def test_other_company_cannot_delete_receipt(
+    client, muller_headers, keller_headers, valid_receipt
+):
+    receipt_id = client.post(
+        "/v1/receipts", json=valid_receipt, headers=muller_headers
+    ).json()["id"]
 
     response = client.delete(f"/v1/receipts/{receipt_id}", headers=keller_headers)
 
     assert response.status_code == 404
-    assert client.get(f"/v1/receipts/{receipt_id}", headers=muller_headers).status_code == 200
+    assert (
+        client.get(f"/v1/receipts/{receipt_id}", headers=muller_headers).status_code
+        == 200
+    )
 
 
 # A deleted receipt is gone
 def test_delete_then_get_returns_404(client, muller_headers, valid_receipt):
-    receipt_id = client.post("/v1/receipts", json=valid_receipt, headers=muller_headers).json()["id"]
+    receipt_id = client.post(
+        "/v1/receipts", json=valid_receipt, headers=muller_headers
+    ).json()["id"]
 
-    delete_response = client.delete(f"/v1/receipts/{receipt_id}", headers=muller_headers)
+    delete_response = client.delete(
+        f"/v1/receipts/{receipt_id}", headers=muller_headers
+    )
     get_response = client.get(f"/v1/receipts/{receipt_id}", headers=muller_headers)
 
     assert delete_response.status_code == 204
